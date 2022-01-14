@@ -1,0 +1,285 @@
+CREATE DATABASE realtor;
+USE realtor;
+
+CREATE TABLE client(
+     	cid INT,
+	cfname VARCHAR(25),
+	clname VARCHAR(25),
+     PRIMARY KEY (cid)
+);
+
+INSERT INTO client VALUES 
+   (1, "Johanne", "Olsen"),
+   (2, "Kyle", "Welsh"),
+   (3, "Caden", "Perez"),
+   (4, "Andrew", "Eber"), 
+   (5, "Trevor", "Scott"),
+   (6, "Connor", "Scott"),
+   (7, "Mark", "Bucaro"),
+   (8, "Thomas", "Neumann"),
+   (9, "Steve", "Welsh"),
+   (10, "Karsen", "Dang"),
+   (11, "Bill", "Scott"),
+   (12, "Rory", "Bedore"),
+   (13, "Karen", "Welsh"),
+   (14, "Lucas", "Welsh"),
+   (15, "Justin", "Fields");
+
+CREATE TABLE property(
+     	pid INT,
+	anum VARCHAR(25),
+	astreet VARCHAR(25),
+	acity VARCHAR(25),
+	astate VARCHAR(25),
+	lprice DOUBLE,
+	type VARCHAR(25),
+     PRIMARY KEY (pid)
+);
+
+INSERT INTO property VALUES
+   (1, "650", "Sadness Ave.", "Aurora", "IL", 150000.99, "house"),
+   (2, "340", "Nice Ct.", "Naperville", "IL", 505000.99, "land"),
+   (3, "300", "Time St.", "Chicago", "IL", 955000.99, "land"),
+   (4, "750", "Good St.", "New York", "NY", 115000.99, "house"),
+   (5, "910", "Happiness Ave", "Yale", "CO", 675000.99, "house"),
+   (6, "650", "Very Nice Ave.", "Springfield", "IL", 155500.99, "house"),
+   (7, "340", "No-Where Ct.", "Who-Knows", "FL", 505000.99, "land"),
+   (8, "300", "Terrible St.", "Chicago", "IL", 1955000.99, "land"),
+   (9, "750", "Bad St.", "New York", "NY", 1115000.99, "house"),
+   (10, "910", "Very-Sad Ave", "Sad", "CO", 675550.99, "land");
+
+
+CREATE TABLE realtor(
+	rid INT,
+     PRIMARY KEY (rid)
+);
+
+INSERT INTO realtor VALUES
+   (1),
+   (2),
+   (3),
+   (4),
+   (5);
+
+CREATE TABLE buyingclient(
+	cid INT,
+      PRIMARY KEY (cid),
+      FOREIGN KEY (cid) REFERENCES client(cid)
+);
+
+INSERT INTO buyingclient VALUES
+   (1),
+   (2),
+   (3),
+   (4),
+   (5),
+   (6),
+   (7),
+   (8),
+   (9),
+   (10);
+
+CREATE TABLE sellingclient(
+     	cid INT,
+      PRIMARY KEY (cid),
+      FOREIGN KEY (cid) REFERENCES client(cid)
+);
+
+INSERT INTO sellingclient VALUES
+   (11),
+   (12),
+   (13),
+   (14),
+   (15);
+
+CREATE TABLE bclientland(
+     	cid INT,
+	minacres FLOAT,
+	maxacres FLOAT,
+      PRIMARY KEY (cid),
+      FOREIGN KEY (cid) REFERENCES buyingclient(cid) 
+);
+
+INSERT INTO bclientland VALUES
+   (1, 1.5, 5.5),
+   (2, 1.8, 4.5),
+   (4, 1.1, 3.5),
+   (5, 0.5, 6.5),
+   (7, 0.2, 10.5),
+   (3, 0.2, 10.0);
+
+CREATE TABLE bclienthouse(
+     	cid INT,
+	style VARCHAR(25),
+	beds FLOAT,
+	baths FLOAT,
+      PRIMARY KEY (cid),
+      FOREIGN KEY (cid) REFERENCES buyingclient(cid) 
+);
+
+INSERT INTO bclienthouse VALUES
+   (8, "1-story", 1.5, 1),
+   (9, "1-story", 1, 1.5),
+   (10, "2-story", 2.5, 2),
+   (5, "3-story", 4, 4.5),
+   (7, "2-story", 3.5, 2.5),
+   (6, "1-story", 1, 1.5);
+
+CREATE TABLE houseproperty( 
+     	pid INT,
+	style VARCHAR(25),
+	beds FLOAT,
+	baths FLOAT,
+      PRIMARY KEY (pid),
+      FOREIGN KEY (pid) REFERENCES property(pid)
+);
+
+INSERT INTO houseproperty VALUES
+   (1, "2-story", 2.5, 1),
+   (4, "1-story", 1, 1.5),
+   (5, "3-story", 5.5, 4.5),
+   (6, "3-story", 4, 4.5),
+   (9, "2-story", 3.5, 2.5);
+
+CREATE TABLE landproperty( 
+     	pid INT,
+	acres FLOAT,
+      PRIMARY KEY (pid),
+      FOREIGN KEY (pid) REFERENCES property(pid)
+);
+
+INSERT INTO landproperty VALUES
+   (2, 0.5),
+   (3, 1.5),
+   (7, 5.2),
+   (8, 9.5),
+   (10, 2.7);
+
+CREATE TABLE houselisting(
+     	pid INT,
+     	cid INT,
+     	rid INT,
+      PRIMARY KEY (pid),
+      FOREIGN KEY (pid) REFERENCES houseproperty(pid),
+      FOREIGN KEY (cid) REFERENCES sellingclient(cid),
+      FOREIGN KEY (rid) REFERENCES realtor(rid)   
+);
+
+INSERT INTO houselisting VALUES
+   (1, 11, 1),
+   (4, 11, 1),
+   (5, 12, 3),
+   (6, 14, 4),
+   (9, 15, 5);
+
+
+CREATE TABLE landlisting(
+     	pid INT,
+     	cid INT,
+     	rid INT,
+      PRIMARY KEY (pid),
+      FOREIGN KEY (pid) REFERENCES landproperty(pid),
+      FOREIGN KEY (cid) REFERENCES sellingclient(cid),
+      FOREIGN KEY (rid) REFERENCES realtor(rid)   
+);
+
+INSERT INTO landlisting VALUES
+   (2, 12, 2),
+   (3, 13, 2),
+   (7, 13, 2),
+   (8, 15, 3),
+   (10, 14, 5);
+
+CREATE TABLE housetransaction(
+     	pid INT,
+     	buyingrid INT,
+     	housebuyingclient INT,
+     	sellprice DOUBLE,
+      PRIMARY KEY (pid),
+      FOREIGN KEY (pid) REFERENCES houseproperty(pid),
+      FOREIGN KEY (buyingrid) REFERENCES realtor(rid),
+      FOREIGN KEY (housebuyingclient) REFERENCES bclienthouse(cid)
+);
+
+INSERT INTO housetransaction VALUES
+   (1, 2, 8, 140000.99),
+   (4, 2, 9, 100000.99),
+   (5, 2, 10, 750999.99),
+   (6, 2, 5, 150000.99),
+   (9, 2, 7, 1000000.99);
+
+CREATE TABLE landtransaction(
+     	pid INT,
+     	buyingrid INT,
+     	landbuyingclient INT,
+     	sellprice DOUBLE,
+      PRIMARY KEY (pid),
+      FOREIGN KEY (pid) REFERENCES landproperty(pid),
+      FOREIGN KEY (buyingrid) REFERENCES realtor(rid),
+      FOREIGN KEY (landbuyingclient) REFERENCES bclientland(cid)
+);
+
+INSERT INTO landtransaction VALUES
+   (2, 4, 1, 540000.99),
+   (3, 4, 2, 1000000.99),
+   (7, 4, 4, 550999.99),
+   (8, 4, 5, 2150000.99),
+   (10, 4, 7, 555555.99);
+
+
+CREATE VIEW landListingWithAllInfo AS
+	SELECT lp.pid, lp.acres, p.anum, p.astreet, p.acity, p.astate, p.lprice
+    		FROM landproperty lp JOIN property p
+    			ON lp.pid = p.pid;
+
+CREATE VIEW houseListingWithAllInfo AS
+	SELECT hp.pid, hp.style, hp.beds, hp.baths, p.anum, p.astreet, p.acity, p.astate, p.lprice
+    		FROM houseproperty hp JOIN property p
+    			ON hp.pid = p.pid;
+
+CREATE VIEW allTransactionsWithSellPrice AS
+	SELECT lt.pid, lt.buyingrid, ll.rid AS sellingrid, 
+	lt.landbuyingclient AS buyingclient, ll.cid AS sellingclient, lt.sellprice
+		FROM landtransaction lt JOIN landlisting ll
+       			ON lt.pid = ll.pid
+		UNION
+		SELECT ht.pid, ht.buyingrid, hl.rid AS sellingrid, 
+		ht.housebuyingclient AS buyingclient, hl.cid AS sellingclient, ht.sellprice
+    			FROM housetransaction ht JOIN houselisting hl
+                	ON ht.pid = hl.pid;
+
+
+CREATE VIEW transactionWithPrices AS
+	SELECT at.pid, at.buyingrid, at.sellingrid, p.lprice, at.sellprice
+		FROM allTransactionsWithSellPrice at JOIN property p
+    			ON at.pid = p.pid;
+
+CREATE VIEW sellingRid AS
+	SELECT h.rid
+    		FROM houselisting h
+    	UNION
+    	SELECT l.rid
+    		FROM landlisting l;
+	
+CREATE VIEW allTransactionsMinusSellingRs AS
+	SELECT *
+		FROM allTransactionsWithSellPrice
+   		WHERE buyingrid NOT IN
+    			(SELECT rid
+     			FROM sellingRid);
+
+CREATE VIEW onlyBuyingClients AS
+	SELECT b.cid
+		FROM buyingclient b
+    	EXCEPT
+    	SELECT s.cid
+    		FROM sellingclient s;
+
+CREATE VIEW priceIncrease AS
+	SELECT pid, (sellprice - lprice) AS pincrease
+    		FROM transactionWithPrices;
+
+CREATE VIEW realtorProfits AS
+	SELECT buyingrid AS rid, (SUM(sellprice) * 0.03) AS profits
+		FROM allTransactionsWithSellPrice
+    			GROUP BY buyingrid;
